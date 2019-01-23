@@ -1,0 +1,27 @@
+{
+  "name": "node-red-contrib-rescuetime",
+  "version": "1.5.5",
+  "description": "Get formatted data from RescueTime.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/balsimpson/node-red-contrib-rescuetime.git"
+  },
+  "author": "tinkr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/balsimpson/node-red-contrib-rescuetime/issues"
+  },
+  "homepage": "https://github.com/balsimpson/node-red-contrib-rescuetime#readme",
+  "dependencies": {
+    "https": "^1.0.0"
+  },
+  "node-red": {
+    "nodes": {
+      "rescuetime": "rescuetime.js"
+    }
+  }
+}

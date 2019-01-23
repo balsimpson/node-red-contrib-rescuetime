@@ -1,0 +1,118 @@
+<!-- 
+    lightBrown: #FDF0C2
+    green: #44A1A0
+ -->
+<script type="text/javascript">
+	RED.nodes.registerType('rescuetime', {
+		category: 'advanced',
+		color: '#FDF0C2',
+		defaults: {
+			name: { value: "RescueTime" },
+			key: { value: "", type: "rescuetime-config" },
+			datatype: { value: "analytic" },
+			restrictkind: { value: "overview" },
+			restrictbegin: { value: "" },
+			restrictend: { value: "" }
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: "feed.png",
+		label: function () {
+			return this.name || "rescuetime";
+        },
+        oneditprepare: function() {
+            let node = this;
+
+            $("#node-input-datatype").on("change", function() {
+                if (this.value === "analytic") {
+                    $("#analytic-details").show();
+                    $("#summary-details").hide();
+                    $("#restrictkind").show();
+                    $("#interval").show();
+                    $("#restrictbegin").show();
+                    $("#restrictend").show();
+                } else if (this.value === "summary") {
+                    $("#summary-details").show();
+                    $("#analytic-details").hide();
+                    $("#restrictkind").hide();
+                    $("#restrictbegin").hide();
+                    $("#restrictend").hide();
+                    $("#choose-kind").hide();
+                }
+            }).change();
+        }
+	});
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('rescuetime-config', {
+		category: 'config',
+		defaults: {
+			api: { value: "", required: true }
+		},
+		label: function () {
+			return 'RescueTime API Key - ' + this.api.substr(0, 5);
+		}
+	});
+</script>
+
+<script type="text/x-red" data-template-name="rescuetime">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-key"><i class="icon-tag"></i> API Key</label>
+        <input type="text" id="node-input-key" placeholder="API Key">
+        <h6><p>Get your API key from <a href="https://www.rescuetime.com/anapi/manage/" target="_blank">RescueTime</a>.</p></h6>
+    </div>
+    <div class="form-row">
+        <label for="node-input-datatype"><i class="fa fa-tasks"></i> Type</label>
+        <select id="node-input-datatype">
+            <option value='analytic' selected>Analytic Data</option>
+            <option value='summary'>Summary Feed</option>
+        </select>
+	</div>
+    <h6 id="choose-kind"><p>Get Analytic Data or a Summary Feed</p></h6>
+    <div class="form-row" id="summary-details">
+        <h6><p>Rollup of daily data for each day logged in the previous two weeks.</p></h6>
+    </div>
+    <div class="form-row" id="analytic-details">
+        <h6><p>Detailed analytic data.</p></h6>
+    </div>
+    <hr>
+    <div class="form-row" id="restrictkind">
+		<h6><p>Choose the kind of data</p></h6>
+        <label for="node-input-restrictkind"><i class="icon-briefcase"></i> Kind</label>
+        <select id="node-input-restrictkind">
+            <option value='overview' selected>Overview</option>
+            <option value='productivity'>Productivity</option>
+            <option value='category'>Category</option>
+            <option value='activity'>Activity</option>
+        </select>
+	</div>
+    <div class="form-row" id="restrictbegin">
+		<h6><p>Choose the start date</p></h6>
+        <label for="node-input-restrictbegin"><i class="icon-calendar"></i> Start Date</label>
+        <input id = "node-input-restrictbegin" type="date" name="start_date">
+    </div>
+    <div class="form-row" id="restrictend">
+		<h6><p>Choose the end date</p></h6>
+        <label for="node-input-restrictend"><i class="icon-calendar"></i> End Date</label>
+        <input id = "node-input-restrictend" type="date" name="end_date">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="rescuetime-config">
+    <div class="form-row">
+        <label for="node-config-input-api"><i class="icon-bookmark"></i> API Key</label>
+        <input type="text" id="node-config-input-api">
+    </div>
+</script>
+<script type="text/x-red" data-help-name="rescuetime">
+    <h2><p>Fetch data from <a href="https://www.rescuetime.com/"></a>RescueTime</p>.</h2>
+    <br>
+    <p>
+        RescueTime helps you understand your daily habits so you can focus and be more productive. It tracks time spent on applications and websites, giving you an accurate picture of your day.
+    </p>  
+</script>
