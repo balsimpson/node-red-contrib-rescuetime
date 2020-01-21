@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-rescuetime",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "description": "Get formatted data from RescueTime.",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,13 @@
   "dependencies": {
     "https": "^1.0.0"
   },
+  "keywords": [
+    "node-red",
+    "rescue time",
+    "productivity",
+    "time track",
+    "api"
+  ],
   "node-red": {
     "nodes": {
       "rescuetime": "rescuetime.js"
