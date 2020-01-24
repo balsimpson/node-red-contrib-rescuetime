@@ -28,6 +28,7 @@
             $("#node-input-datatype").on("change", function() {
                 if (this.value === "analytic") {
                     $("#analytic-details").show();
+                    $('#restrictkind').val(this.restrictkind);
                     $("#restrictkind").show();
                     $("#restrictbegin").show();
                     $("#restrictend").show();
