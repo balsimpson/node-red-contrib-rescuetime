@@ -24,6 +24,28 @@ const makeHttpCall = async (options) => {
 	}
 }
 
+const getRescuetimeData = async (data) => {
+	let path = `/anapi/daily_summary_feed?key=${data.key}&format=json`;
+
+	if (data.kind) {
+		path = `/anapi/data?key=${data.key}&perspective=interval&restrict_kind=${data.kind}&interval=${data.interval}&restrict_begin=${data.begin}&restrict_end=${data.end}&format=json`
+	}
+	let options = {
+		host: 'www.rescuetime.com',
+		port: 443,
+		path: path,
+		headers: {
+			'Content-Type': 'application/json',
+			"charset": 'utf-8'
+		},
+		method: 'GET'
+	};
+
+	// console.log(options.host + options.path);
+	let results = await makeHttpCall(options);
+	return results;
+}
+
 const getAnalytics = async (data) => {
 	let options = {
 		host: 'www.rescuetime.com',
@@ -201,172 +223,145 @@ const getSummary = async (api_key) => {
 	return return_data;
 }
 
-const getOverview = (results) => {
-	// console.log(`results: ${JSON.stringify(results, null, 2)}`);
+/**
+* A basic Hello World function
+* @param {object} data API response data from rescuetime
+* @param {string} data_type Can be activity | document | category | productivity
+* @param {boolean} datewise Group data datewise if true
+* @param {string} format Make time text readable if 'readable'
+* @returns {object.http}
+*/
+function getDetails(data, data_type, datewise = false, format) {
+	let type_index = 0;
 
-	let categories = {};
+	let results = {};
 
-	results.rows.map(result => {
-		if (categories[result[3]]) {
-			categories[result[3]] += Math.round((result[1] / 60));
-		} else {
-			categories[result[3]] = Math.round((result[1] / 60));
+	switch (data_type) {
+		case 'activity':
+			type_index = 3;
+			break;
+		case 'document':
+			type_index = 4;
+			break;
+		case 'category':
+			type_index = 5;
+			break;
+		case 'productivity':
+			type_index = 6;
+			break;
+		default:
+			type_index = 6;
+			break;
+	}
+
+	data.rows.map(row => {
+		let date = row[0].substr(0, 10);
+		let duration = row[1];
+		let category = row[type_index];
+
+		if (typeof category === 'number') {
+			if (category === 2) {
+				category = 'very_productive'
+			}
+			if (category === 1) {
+				category = 'productive'
+			}
+			if (category === 0) {
+				category = 'neutral'
+			}
+			if (category === -1) {
+				category = 'unproductive'
+			}
+			if (category === -2) {
+				category = 'very_unproductive'
+			}
 		}
-	});
+		// console.log(category)
+
+		if (datewise) {
+			getDateWise(date, category, duration);
+		} else {
+			getCategoryWise(duration, category);
+		}
+	})
 
 	const compare = (a, b) => {
-		if (a.time > b.time)
+
+		if (a[1] > b[1])
 			return -1;
-		if (a.time < b.time)
+		if (a[1] < b[1])
 			return 1;
 		return 0;
+	};
+
+	results = Object.entries(results)
+		.sort(compare)
+		.reduce((accum, [k, v]) => {
+			accum[k] = v;
+			return accum;
+		}, {});
+
+	if (datewise && format === 'readable') {
+		for (key in results) {
+			for (j in results[key]) {
+				results[key][j] = getDurationTxt(results[key][j]);
+			}
+		}
+	} else if (format === 'readable') {
+		for (key in results) {
+			results[key] = getDurationTxt(results[key]);
+		}
 	}
 
-	let keys = Object.keys(categories);
-	let categories_sorted = [];
+	return results;
 
-	for (let i = 0; i < keys.length; i++) {
-		const element = keys[i];
-		categories_sorted.push({
-			name: keys[i],
-			time: categories[keys[i]]
-		});
+	function getDateWise(date, category, duration) {
+		if (results[date]) {
+			if (results[date][category]) {
+				results[date][category] += parseInt(duration);
+			}
+			else {
+				results[date][category] = parseInt(duration);
+			}
+			results[date].total += parseInt(duration);
+		}
+		else {
+			results[date] = {
+				total: 0,
+				[category]: parseInt(duration)
+			};
+			results[date].total += parseInt(duration);
+		}
 	}
 
-	categories_sorted.sort(compare);
-
-	let return_data = {
-		categories: categories_sorted,
-		results: results
+	function getCategoryWise(duration, category) {
+		if (results.total) {
+			results.total += parseInt(duration);
+		}
+		else {
+			results.total = parseInt(duration);
+		}
+		if (results[category]) {
+			results[category] += parseInt(duration);
+		}
+		else {
+			results[category] = parseInt(duration);
+		}
 	}
-
-	return return_data;
 }
 
-const getProductivity = (results) => {
-	let productivity = {};
-	let total_minutes = 0;
-
-	results.rows.map(result => {
-		total_minutes += Math.round((result[1] / 60));
-		if (productivity[result[3]]) {
-			productivity[result[3]] += Math.round((result[1] / 60));
-		} else {
-			productivity[result[3]] = Math.round((result[1] / 60));
+function getDurationTxt(duration_seconds) {
+	let durMinutes = (duration_seconds / 60).toFixed(0);
+	let dur = '';
+	if (durMinutes >= 60) {
+		dur = (durMinutes / 60).toFixed(0) + ' hr';
+		if (durMinutes % 60 > 10) {
+			dur += ' ' + durMinutes % 60 + ' min';
 		}
-	});
-
-	let return_data = {
-		total_minutes: total_minutes,
-		very_productive: productivity['2'],
-		productive: productivity['1'],
-		neutral: productivity['0'],
-		unproductive: productivity['-1'],
-		very_unproductive: productivity['-2']
+	} else {
+		dur = durMinutes + ' min';
 	}
-
-	return return_data;
-}
-
-const getCategory = (results) => {
-	let categories = {};
-	let total_minutes = 0;
-
-	results.rows.map(result => {
-		total_minutes += Math.round((result[1] / 60));
-		if (categories[result[3]]) {
-			categories[result[3]] += Math.round((result[1] / 60));
-		} else {
-			categories[result[3]] = Math.round((result[1] / 60));
-		}
-	});
-
-	const compare = (a, b) => {
-		if (a.time_minutes > b.time_minutes)
-			return -1;
-		if (a.time_minutes < b.time_minutes)
-			return 1;
-		return 0;
-	}
-
-	let keys = Object.keys(categories);
-	let categories_sorted = [];
-
-	for (let i = 0; i < keys.length; i++) {
-		const element = keys[i];
-		categories_sorted.push({
-			name: keys[i],
-			time_minutes: categories[keys[i]]
-		});
-	}
-
-	categories_sorted.sort(compare);
-
-	let return_data = {
-		categories: categories_sorted,
-		results: results
-	}
-
-	return return_data;
-}
-
-const getActivity = (results) => {
-	
-	let total_minutes = 0;
-	let activities = {};
-	let categories = {};
-
-	results.rows.map(result => {
-		total_minutes += Math.round((result[1] / 60));
-		if (categories[result[4]]) {
-			categories[result[4]] += Math.round((result[1] / 60));
-		} else {
-			categories[result[4]] = Math.round((result[1] / 60));
-		}
-		if (activities[result[3]]) {
-			activities[result[3]] += Math.round((result[1] / 60));
-		} else {
-			activities[result[3]] = Math.round((result[1] / 60));
-		}
-	});
-
-	const compare = (a, b) => {
-		if (a.time_minutes > b.time_minutes)
-			return -1;
-		if (a.time_minutes < b.time_minutes)
-			return 1;
-		return 0;
-	}
-
-	let category_keys = Object.keys(categories);
-	let categories_sorted = [];
-	for (let i = 0; i < category_keys.length; i++) {
-		const element = category_keys[i];
-		categories_sorted.push({
-			name: category_keys[i],
-			time_minutes: categories[category_keys[i]]
-		});
-	}
-	categories_sorted.sort(compare);
-
-	let activity_keys = Object.keys(activities);
-	let activities_sorted = [];
-	for (let i = 0; i < activity_keys.length; i++) {
-		const element = activity_keys[i];
-		activities_sorted.push({
-			name: activity_keys[i],
-			time_minutes: activities[activity_keys[i]]
-		});
-	}
-	activities_sorted.sort(compare);
-
-	let return_data = {
-		activities: activities_sorted,
-		categories: categories_sorted,
-		results: results
-	}
-
-	return return_data;
+	return dur;
 }
 
 module.exports = function (RED) {
@@ -389,7 +384,7 @@ module.exports = function (RED) {
 			}
 
 			if (config.datatype === 'analytic') {
-				console.log(`data: ${JSON.stringify(data, null, 2)}`);
+				node.log(`data: ${JSON.stringify(data, null, 2)}`);
 				results = getAnalytics(data);
 			} else {
 				results = getSummary(key.api);

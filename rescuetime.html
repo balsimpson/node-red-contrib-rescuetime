@@ -9,16 +9,18 @@
 		defaults: {
 			name: { value: "RescueTime" },
 			key: { value: "", type: "rescuetime-config" },
-			datatype: { value: "analytic" },
+			datatype: { value: "summary" },
 			restrictkind: { value: "overview" },
 			restrictbegin: { value: "" },
-			restrictend: { value: "" }
+            restrictend: { value: "" },
+            grouping: { value: false },
+            timeformat: { value: false }
 		},
 		inputs: 1,
 		outputs: 1,
 		icon: "feed.png",
 		label: function () {
-			return this.name || "rescuetime";
+			return this.datatype || "rescuetime";
         },
         oneditprepare: function() {
             let node = this;
@@ -26,18 +28,15 @@
             $("#node-input-datatype").on("change", function() {
                 if (this.value === "analytic") {
                     $("#analytic-details").show();
-                    $("#summary-details").hide();
                     $("#restrictkind").show();
                     $("#interval").show();
                     $("#restrictbegin").show();
                     $("#restrictend").show();
                 } else if (this.value === "summary") {
-                    $("#summary-details").show();
                     $("#analytic-details").hide();
                     $("#restrictkind").hide();
                     $("#restrictbegin").hide();
                     $("#restrictend").hide();
-                    $("#choose-kind").hide();
                 }
             }).change();
         }
@@ -64,42 +63,40 @@
     <div class="form-row">
         <label for="node-input-key"><i class="icon-tag"></i> API Key</label>
         <input type="text" id="node-input-key" placeholder="API Key">
-        <h6><p>Get your API key from <a href="https://www.rescuetime.com/anapi/manage/" target="_blank">RescueTime</a>.</p></h6>
+        <p>Get your API key from <a href="https://www.rescuetime.com/anapi/manage/" target="_blank">RescueTime</a>.</p>
     </div>
     <div class="form-row">
         <label for="node-input-datatype"><i class="fa fa-tasks"></i> Type</label>
         <select id="node-input-datatype">
-            <option value='analytic' selected>Analytic Data</option>
-            <option value='summary'>Summary Feed</option>
+            <option value='summary' selected>Summary Feed</option>
+            <option value='analytic'>Analytic Data</option>
         </select>
-	</div>
-    <h6 id="choose-kind"><p>Get Analytic Data or a Summary Feed</p></h6>
-    <div class="form-row" id="summary-details">
-        <h6><p>Rollup of daily data for each day logged in the previous two weeks.</p></h6>
-    </div>
-    <div class="form-row" id="analytic-details">
-        <h6><p>Detailed analytic data.</p></h6>
     </div>
     <hr>
     <div class="form-row" id="restrictkind">
-		<h6><p>Choose the kind of data</p></h6>
         <label for="node-input-restrictkind"><i class="icon-briefcase"></i> Kind</label>
         <select id="node-input-restrictkind">
-            <option value='overview' selected>Overview</option>
-            <option value='productivity'>Productivity</option>
-            <option value='category'>Category</option>
+            <!-- <option value='overview' selected>Overview</option> -->
+            <option value='document'>Document</option>
             <option value='activity'>Activity</option>
+            <option value='category'>Category</option>
+            <option value='productivity'>Productivity</option>
+            <!-- <option value='efficiency'>Efficiency</option> -->
         </select>
-	</div>
+    </div>
     <div class="form-row" id="restrictbegin">
-		<h6><p>Choose the start date</p></h6>
         <label for="node-input-restrictbegin"><i class="icon-calendar"></i> Start Date</label>
-        <input id = "node-input-restrictbegin" type="date" name="start_date">
+        <input id="node-input-restrictbegin" type="date" name="start_date">
     </div>
     <div class="form-row" id="restrictend">
-		<h6><p>Choose the end date</p></h6>
         <label for="node-input-restrictend"><i class="icon-calendar"></i> End Date</label>
-        <input id = "node-input-restrictend" type="date" name="end_date">
+        <input id="node-input-restrictend" type="date" name="end_date">
+    </div>
+    <div class="form-row" id="grouping">
+        <input type="checkbox" value="readable" id="node-input-grouping"> Group data by date<br>
+    </div>
+    <div class="form-row" id="timeformat">
+        <input type="checkbox" value="readable" id="node-input-timeformat"> Make duration readable<br>
     </div>
 </script>
 
