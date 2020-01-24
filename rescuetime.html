@@ -7,7 +7,7 @@
 		category: 'advanced',
 		color: '#FDF0C2',
 		defaults: {
-			name: { value: "RescueTime" },
+			name: { value: "" },
 			key: { value: "", type: "rescuetime-config" },
 			datatype: { value: "summary" },
 			restrictkind: { value: "overview" },
@@ -20,7 +20,7 @@
 		outputs: 1,
 		icon: "feed.png",
 		label: function () {
-			return this.datatype || "rescuetime";
+			return this.name || this.datatype;
         },
         oneditprepare: function() {
             let node = this;

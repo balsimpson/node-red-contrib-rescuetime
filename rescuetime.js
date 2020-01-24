@@ -380,12 +380,14 @@ module.exports = function (RED) {
 				kind: config.restrictkind,
 				interval: config.interval,
 				begin: config.restrictbegin,
-				end: config.restrictend
+				end: config.restrictend,
+				grouping: config.grouping,
+				timeformat: config.timeformat
 			}
 
 			if (config.datatype === 'analytic') {
 				node.log(`data: ${JSON.stringify(data, null, 2)}`);
-				results = getAnalytics(data);
+				results = getRescuetimeData(data);
 			} else {
 				results = getSummary(key.api);
 			}
