@@ -28,7 +28,7 @@
             $("#node-input-datatype").on("change", function() {
                 if (this.value === "analytic") {
                     $("#analytic-details").show();
-                    $('#node-input-restrictkind').val(this.restrictkind);
+                    $('#node-input-restrictkind option[value=document]' ).attr('selected','selected');;
                     $("#restrictkind").show();
                     $("#restrictbegin").show();
                     $("#restrictend").show();
@@ -75,8 +75,8 @@
     <div class="form-row" id="restrictkind">
         <label for="node-input-restrictkind"><i class="icon-briefcase"></i> Kind</label>
         <select id="node-input-restrictkind">
-            <option value='document'>Document</option>
-            <option value='activity' selected>Activity</option>
+            <option value='document' selected>Document</option>
+            <option value='activity'>Activity</option>
             <option value='category'>Category</option>
             <option value='productivity'>Productivity</option>
         </select>
