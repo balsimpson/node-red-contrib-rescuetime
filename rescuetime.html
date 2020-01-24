@@ -5,7 +5,7 @@
 <script type="text/javascript">
 	RED.nodes.registerType('rescuetime', {
 		category: 'advanced',
-		color: '#0080ff',
+		color: '#9accff',
 		defaults: {
 			name: { value: "" },
 			key: { value: "", type: "rescuetime-config" },
@@ -18,7 +18,7 @@
 		},
 		inputs: 1,
 		outputs: 1,
-		icon: "feed.png",
+		icon: "timer.png",
 		label: function () {
 			return this.name || this.datatype;
         },
@@ -75,8 +75,8 @@
     <div class="form-row" id="restrictkind">
         <label for="node-input-restrictkind"><i class="icon-briefcase"></i> Kind</label>
         <select id="node-input-restrictkind">
-            <!-- <option value='overview' selected>Overview</option> -->
-            <option value='document'>Document</option>
+            <!-- <option value='overview' >Overview</option> -->
+            <option value='document' selected>Document</option>
             <option value='activity'>Activity</option>
             <option value='category'>Category</option>
             <option value='productivity'>Productivity</option>

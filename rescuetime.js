@@ -28,7 +28,7 @@ const getRescuetimeData = async (data) => {
 	let path = `/anapi/daily_summary_feed?key=${data.key}&format=json`;
 
 	if (data.kind) {
-		path = `/anapi/data?key=${data.key}&perspective=interval&restrict_kind=${data.kind}&interval=${data.interval}&restrict_begin=${data.begin}&restrict_end=${data.end}&format=json`
+		path = `/anapi/data?key=${data.key}&perspective=interval&restrict_kind=${data.kind}&restrict_begin=${data.begin}&restrict_end=${data.end}&format=json`
 	}
 	let options = {
 		host: 'www.rescuetime.com',
@@ -41,8 +41,8 @@ const getRescuetimeData = async (data) => {
 		method: 'GET'
 	};
 
-	// console.log(options.host + options.path);
 	let results = await makeHttpCall(options);
+	console.log('results:', results);
 	return results;
 }
 
